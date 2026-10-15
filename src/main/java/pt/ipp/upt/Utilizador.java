@@ -25,4 +25,41 @@ public class Utilizador {
     public TipoUtilizador getTipo() {
         return tipo;
     }
+
+    public void editarPerfil() {
+            System.out.print("Novo nome [" + nome + "]: ");
+            String texto = Main.sc.nextLine();
+            if (!texto.equals("")) {
+                nome = texto;
+            }
+
+            System.out.print("Novo contacto [" + contacto + "]: ");
+            texto = Main.sc.nextLine();
+            if (!texto.equals("")) {
+                contacto = texto;
+            }
+
+            System.out.print("Nova password (Enter para manter): ");
+            texto = Main.sc.nextLine();
+            if (!texto.equals("")) {
+                password = texto;
+            }
+
+            System.out.println("Perfil atualizado!");
+        }
+    
+    public void visualizarAnuncios() {
+        System.out.println("--- Todos os anúncios ---");
+        boolean encontrou = false;
+        for (Objeto o : Main.objetos) {
+            if (o.isEstado()) {
+                o.consultarDetalhes();
+                encontrou = true;
+            }
+        }
+        if (!encontrou) {
+            System.out.println("Não há anúncios.");
+        }
+    }
+    //teste
 }
