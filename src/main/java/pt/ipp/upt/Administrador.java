@@ -17,7 +17,6 @@ public class Administrador extends Utilizador {
         visualizarObjeto();
         System.out.print("ID do anúncio a eliminar: ");
         int id = Main.lerInt();
-
         Objeto encontrado = null;
         for (Objeto o : Main.objetos) {
             if (o.getId() == id) {
@@ -28,8 +27,7 @@ public class Administrador extends Utilizador {
             System.out.println("Esse anúncio não existe.");
             return;
         }
-
-        encontrado.eliminar();
+        Objeto.eliminar(encontrado);
         for (Utilizador u : Main.utilizadores) {
             u.removerObjeto(encontrado);
         }
@@ -50,7 +48,7 @@ public class Administrador extends Utilizador {
                 resolvidos++;
             }
         }
-        System.out.println("--- Estatísticas ---");
+        System.out.println("--- Estatísticas do Sistema ---");
         System.out.println("Utilizadores: " + Main.utilizadores.size());
         System.out.println("Objetos: " + Main.objetos.size());
         System.out.println("Encontrados: " + encontrados);
