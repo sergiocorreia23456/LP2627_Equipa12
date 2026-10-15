@@ -44,4 +44,34 @@ public class Objeto {
     public Categoria getCategoria() {
         return categoria;
     }
+    
+    public void editar() {
+            System.out.print("Novo título [" + titulo + "]: ");
+            String texto = Main.sc.nextLine();
+            if (!texto.equals("")) {
+                titulo = texto;
+            }
+            System.out.print("Nova descrição [" + descricao + "]: ");
+            texto = Main.sc.nextLine();
+            if (!texto.equals("")) {
+                descricao = texto;
+            }
+            System.out.print("Nova marca [" + marca.getNome() + "]: ");
+            texto = Main.sc.nextLine();
+            if (!texto.equals("")) {
+                marca = new Marca(Main.proximoIdMarca, texto);
+                Main.proximoIdMarca++;
+            }
+            System.out.print("Nova localização [" + localizacao + "]: ");
+            texto = Main.sc.nextLine();
+            if (!texto.equals("")) {
+                localizacao = texto;
+            }
+            System.out.print("Já foi resolvido? (s/n): ");
+            texto = Main.sc.nextLine();
+            if (texto.equals("s")) {
+                estado = false;
+            }
+            System.out.println("Objeto atualizado!");
+        }
 }
