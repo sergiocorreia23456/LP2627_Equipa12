@@ -24,23 +24,19 @@ public class Objeto {
         this.dataRegisto = LocalDate.now();
         this.estado = true;
     }
-
+    
     public int getId() {
         return id;
     }
-
     public String getTitulo() {
         return titulo;
     }
-
     public boolean isEstado() {
         return estado;
     }
-
     public TipoObjeto getTipo() {
         return tipo;
     }
-
     public Categoria getCategoria() {
         return categoria;
     }
@@ -67,12 +63,38 @@ public class Objeto {
             if (!texto.equals("")) {
                 localizacao = texto;
             }
-            System.out.print("Já foi resolvido? (s/n): ");
+            System.out.print("Já foi resolvido? (sim/não): ");
             texto = Main.sc.nextLine();
-            if (texto.equals("s")) {
+            if (texto.equals("sim")) {
                 estado = false;
             }
             System.out.println("Objeto atualizado!");
         }
-    //teste
+    
+    public static void eliminar(Objeto o) {
+        Main.objetos.remove(o);
+    }
+    
+    public void consultarDetalhes() {
+        System.out.println("----------------------------");
+        System.out.println("ID: " + id);
+        System.out.println("Tipo: " + tipo);
+        System.out.println("Título: " + titulo);
+        System.out.println("Descrição: " + descricao);
+        System.out.println("Marca: " + marca.getNome());
+        System.out.println("Categoria: " + categoria.getNome());
+        System.out.println("Localização: " + localizacao);
+        System.out.println("Data: " + dataRegisto);
+        if (estado) {
+            System.out.println("Estado: Ativo");
+        } else {
+            System.out.println("Estado: Resolvido");
+        }
+    }
+    
+    // Usado na pesquisa: junta todo o texto do objeto numa só String
+    public String getTextoParaPesquisa() {
+        return titulo + " " + descricao + " " + marca.getNome() + " "
+                + localizacao + " " + categoria.getNome();
+    }
 }
