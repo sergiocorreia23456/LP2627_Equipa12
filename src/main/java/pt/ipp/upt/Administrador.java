@@ -40,6 +40,7 @@ public class Administrador extends Utilizador {
             if (!o.isEstado()) {
                 resolvidos++;
             }
+            
         }
         System.out.println("--- Estatísticas ---");
         System.out.println("Utilizadores: " + Main.utilizadores.size());
