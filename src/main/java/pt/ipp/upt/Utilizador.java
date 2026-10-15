@@ -61,5 +61,32 @@ public class Utilizador {
             System.out.println("Não há anúncios.");
         }
     }
-    //teste
+
+    public void pesquisarObjeto() {
+            System.out.print("Palavra a pesquisar: ");
+            String palavra = Main.sc.nextLine().toLowerCase();
+
+            int contador = 0;
+            for (Objeto o : Main.objetos) {
+                if (o.isEstado() && o.getTextoParaPesquisa().toLowerCase().contains(palavra)) {
+                    o.consultarDetalhes();
+                    contador++;
+                }
+            }
+            System.out.println(contador + " resultado(s).");
+        }
+
+        public void consultarObjetosEncontrados() {
+            System.out.println("--- Objetos encontrados ---");
+            boolean encontrou = false;
+            for (Objeto o : Main.objetos) {
+                if (o.getTipo() == TipoObjeto.ENCONTRADO && o.isEstado()) {
+                    o.consultarDetalhes();
+                    encontrou = true;
+                }
+            }
+            if (!encontrou) {
+                System.out.println("Não há objetos encontrados.");
+            }
+        }
 }
