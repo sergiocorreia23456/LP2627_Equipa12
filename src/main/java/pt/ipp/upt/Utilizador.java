@@ -25,7 +25,7 @@ public class Utilizador {
     public TipoUtilizador getTipo() {
         return tipo;
     }
-
+    
     public void editarPerfil() {
             System.out.print("Novo nome [" + nome + "]: ");
             String texto = Main.sc.nextLine();
