@@ -1,25 +1,20 @@
 package pt.ipp.upt;
 import java.util.ArrayList;
 import java.util.Scanner;
+import org.hibernate.Session;
 
 public class Main {  // static pois o atributo pertence à classe, e não a cada objeto criado a partir dela.
     static Scanner sc = new Scanner(System.in);
     static ArrayList<Utilizador> utilizadores = new ArrayList<>();
     static ArrayList<Objeto> objetos = new ArrayList<>();
-    static ArrayList<Categoria> categorias = new ArrayList<>();
     static Utilizador sessaoAtual = null; // quem tem a sessão iniciada
     static int proximoIdUtilizador = 2;
     static int proximoIdObjeto = 1;
     static int proximoIdMarca = 1;
 
     public static void main(String[] args) {
-        // Categorias iniciais
-        categorias.add(new Categoria(1, "Eletrónica"));
-        categorias.add(new Categoria(2, "Roupa"));
-        categorias.add(new Categoria(3, "Documentos"));
-        categorias.add(new Categoria(4, "Chaves"));
         //Administrador
-        utilizadores.add(new Administrador(1, "Admin", "admin@upt.pt", "123", "999888777"));
+        utilizadores.add(new Administrador(1, "Admin UPT", "admin@upt.pt", "123", "999888777"));
         System.out.println("╔════════════════════════════════════╗");
         System.out.println("║    OBJETOS ACHADOS E PERDIDOS      ║");
         System.out.println("╚════════════════════════════════════╝");
@@ -45,12 +40,9 @@ public class Main {  // static pois o atributo pertence à classe, e não a cada
     }
 
     public static Categoria procurarCategoria(int id) {
-        for (Categoria c : categorias) {
-            if (c.getId() == id) {
-                return c;
-            }
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(Categoria.class, id);
         }
-        return null;
     }
 
     // Título dos menus
@@ -72,6 +64,7 @@ public class Main {  // static pois o atributo pertence à classe, e não a cada
             Utilizador.iniciarSessao();
         } else if (opcao == 0) {
             System.out.println("Até à próxima!");
+            HibernateUtil.shutdown();
             System.exit(0);
         } else {
             System.out.println("Opção inválida.");
