@@ -4,21 +4,12 @@ import java.util.ArrayList;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 
 public class Tabelas {
 
-    private static SessionFactory sessionFactory;
+	private static final SessionFactory sessionFactory =
+	        HibernateUtil.getSessionFactory();
     public static void menu() {
-        try {
-            sessionFactory = new Configuration()
-                    .configure("hibernate.cfg.xml")
-                    .buildSessionFactory();
-        } catch (Exception e) {
-            System.out.println("Não foi possível ligar à base de dados: " + e.getMessage());
-            return;
-        }
-        try {
             while (true) {
                 System.out.println();
                 System.out.println("=== Gerir Tabelas ===");
@@ -73,9 +64,6 @@ public class Tabelas {
                     }
                 }
             }
-        } finally {
-            sessionFactory.close();
-        }
     }
     // ================= MARCAS =================
     public static void criarMarca() {
@@ -160,6 +148,15 @@ public class Tabelas {
     }
 
     // ================= CATEGORIAS =================
+    public static ArrayList<Categoria> obterCategorias() {
+        try (Session session = sessionFactory.openSession()) {
+            return new ArrayList<>(
+                session.createQuery("from Categoria", Categoria.class)
+                       .getResultList()
+            );
+        }
+    }
+    
     public static void criarCategoria() {
         System.out.print("Nome da categoria: ");
         String nome = Main.sc.nextLine();
