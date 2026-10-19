@@ -66,23 +66,42 @@ public class Tabelas {
             }
     }
     // ================= MARCAS =================
+
     public static void criarMarca() {
+    String nome;
+    do {
         System.out.print("Nome da marca: ");
-        String nome = Main.sc.nextLine();
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.persist(new Marca(nome));
-            transaction.commit();
-            System.out.println("Marca criada com sucesso!");
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            System.out.println("Erro na base de dados: " + e.getMessage());
+        nome = Main.sc.nextLine().trim();
+        if (nome.isBlank()) {
+            System.out.println("O nome da marca não pode estar vazio!");
         }
+    } while (nome.isBlank());
+    Transaction transaction = null;
+    try (Session session = sessionFactory.openSession()) {
+        // Verificar se a marca já existe
+        Marca existente = session.createQuery(
+                "FROM Marca WHERE LOWER(nome) = :nome",
+                Marca.class)
+                .setParameter("nome", nome.toLowerCase(java.util.Locale.ROOT))
+                .setMaxResults(1)
+                .uniqueResult();
+        if (existente != null) {
+            System.out.println("Essa marca já existe na base de dados!");
+            return;
+        }
+        // Criar uma nova marca
+        transaction = session.beginTransaction();
+        session.persist(new Marca(nome));
+        transaction.commit();
+        System.out.println("Marca criada com sucesso!");
+    } catch (Exception e) {
+        if (transaction != null && transaction.isActive()) {
+            transaction.rollback();
+        }
+        System.out.println("Erro na base de dados: " + e.getMessage());
     }
-    
+}
+
     public static void readMarcas() {
         System.out.println("--- Marcas ---");
         try (Session session = sessionFactory.openSession()) {
@@ -97,31 +116,49 @@ public class Tabelas {
         }
     }
 
+
     public static void editarMarca() {
-        readMarcas();
-        System.out.print("ID da marca a editar: ");
-        int id = Main.lerInt();
-        System.out.print("Novo nome: ");
-        String nome = Main.sc.nextLine();
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            Marca marca = session.get(Marca.class, id);
-            if (marca == null) {
-                System.out.println("Esse ID não existe.");
-                transaction.rollback();
-                return;
-            }
-            marca.setNome(nome); // o Hibernate deteta a alteração
-            transaction.commit();
-            System.out.println("Marca atualizada com sucesso!");
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            System.out.println("Erro na base de dados: " + e.getMessage());
-        }
+    readMarcas();
+    System.out.print("ID da marca a editar: ");
+    int id = Main.lerInt();
+    System.out.print("Novo nome: ");
+    String nome = Main.sc.nextLine().trim();
+    if (nome.isBlank()) {
+        System.out.println("O nome da marca não pode estar vazio!");
+        return;
     }
+    Transaction transaction = null;
+    try (Session session = sessionFactory.openSession()) {
+        transaction = session.beginTransaction();
+        Marca marca = session.get(Marca.class, id);
+        if (marca == null) {
+            System.out.println("Essa marca não existe.");
+            transaction.rollback();
+            return;
+        }
+        // Verificar se outra marca já tem este nome
+        Long duplicados = session.createQuery(
+                "SELECT COUNT(m) FROM Marca m " +
+                "WHERE LOWER(m.nome) = :nome AND m.id <> :id",
+                Long.class)
+                .setParameter("nome", nome.toLowerCase(java.util.Locale.ROOT))
+                .setParameter("id", id)
+                .getSingleResult();
+        if (duplicados > 0) {
+            System.out.println("Já existe outra marca com esse nome!");
+            transaction.rollback();
+            return;
+        }
+        marca.setNome(nome);
+        transaction.commit();
+        System.out.println("Marca atualizada com sucesso!");
+    } catch (Exception e) {
+        if (transaction != null && transaction.isActive()) {
+            transaction.rollback();
+        }
+        System.out.println("Erro na base de dados: " + e.getMessage());
+    }
+}
 
     public static void eliminarMarca() {
         readMarcas();

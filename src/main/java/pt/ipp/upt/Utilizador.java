@@ -64,8 +64,14 @@ public class Utilizador {
         String nome = Main.sc.nextLine();
         System.out.print("Email: ");
         String email = Main.sc.nextLine();
-        System.out.print("Password: ");
-        String password = Main.sc.nextLine();
+        String password;
+        do {
+            System.out.print("Password: ");
+            password = Main.sc.nextLine();
+            if (password.isBlank()) {
+                System.out.println("Erro: A password não pode estar vazia!");
+            }
+        } while (password.isBlank());
         System.out.print("Contacto: ");
         String contacto = Main.sc.nextLine();
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -169,67 +175,85 @@ public class Utilizador {
         }
     }
 
+
     public void registarObjeto() {
-        System.out.print("Tipo (1 = Encontrado, 2 = Perdido): ");
-        int opcao = Main.lerInt();
-        if (opcao != 1 && opcao != 2) {
-            System.out.println("Tipo inválido.");
+    System.out.print("Tipo (1 = Encontrado, 2 = Perdido): ");
+    int opcao = Main.lerInt();
+    if (opcao != 1 && opcao != 2) {
+        System.out.println("Tipo inválido.");
+        return;
+    }
+    TipoObjeto tipoObjeto = (opcao == 1)
+            ? TipoObjeto.ENCONTRADO
+            : TipoObjeto.PERDIDO;
+    System.out.print("Título: ");
+    String titulo = Main.sc.nextLine();
+    System.out.print("Descrição: ");
+    String descricao = Main.sc.nextLine();
+    System.out.print("Localização: ");
+    String localizacao = Main.sc.nextLine();
+    // O utilizador introduz a marca
+    String nomeMarca;
+    do {
+        System.out.print("Marca: ");
+        nomeMarca = Main.sc.nextLine().trim();
+        if (nomeMarca.isBlank()) {
+            System.out.println("A marca não pode estar vazia!");
+        }
+    } while (nomeMarca.isBlank());
+    try (Session session =
+            HibernateUtil.getSessionFactory().openSession()) {
+        // Procurar uma marca existente
+        Marca marca = session.createQuery(
+                "FROM Marca WHERE LOWER(nome) = :nome",
+                Marca.class)
+                .setParameter("nome", nomeMarca.toLowerCase(java.util.Locale.ROOT))
+                .setMaxResults(1)
+                .uniqueResult();
+        // Se não existir, preparar uma nova marca
+        boolean novaMarca = (marca == null);
+        if (novaMarca) {
+            marca = new Marca(0, nomeMarca);
+        }
+        // Mostrar as categorias disponíveis
+        System.out.println("Categorias:");
+        for (Categoria c : session.createQuery(
+                "FROM Categoria", Categoria.class).getResultList()) {
+            System.out.println(c.getId() + " - " + c.getNome());
+        }
+        System.out.print("ID da categoria: ");
+        int idCategoria = Main.lerInt();
+        Categoria categoria = session.get(
+                Categoria.class, idCategoria);
+        if (categoria == null) {
+            System.out.println("Categoria não existe.");
             return;
         }
-        TipoObjeto tipoObjeto = (opcao == 1)
-                ? TipoObjeto.ENCONTRADO
-                : TipoObjeto.PERDIDO;
-        System.out.print("Título: ");
-        String titulo = Main.sc.nextLine();
-        System.out.print("Descrição: ");
-        String descricao = Main.sc.nextLine();
-        System.out.print("Localização: ");
-        String localizacao = Main.sc.nextLine();
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // Mostrar as marcas existentes
-            System.out.println("Marcas:");
-            for (Marca m : session.createQuery("FROM Marca", Marca.class).getResultList()) {
-                System.out.println(m.getId() + " - " + m.getNome());
+        // Criar o objeto
+        Objeto novo = new Objeto(0,titulo,descricao,marca,localizacao,categoria,tipoObjeto);
+        // Associar o objeto ao utilizador
+        novo.setUtilizador(this);
+        Transaction transaction = session.beginTransaction();
+        try {
+            // Guardar a marca apenas se for nova
+            if (novaMarca) {
+                session.persist(marca);
             }
-            System.out.print("ID da marca: ");
-            int idMarca = Main.lerInt();
-            Marca marca = session.get(Marca.class, idMarca);
-            if (marca == null) {
-                System.out.println("Marca não existe.");
-                return;
-            }
-            // Mostrar as categorias existentes
-            System.out.println("Categorias:");
-            for (Categoria c : session.createQuery("FROM Categoria", Categoria.class).getResultList()) {
-                System.out.println(c.getId() + " - " + c.getNome());
-            }
-            System.out.print("ID da categoria: ");
-            int idCategoria = Main.lerInt();
-            Categoria categoria = session.get(Categoria.class, idCategoria);
-            if (categoria == null) {
-                System.out.println("Categoria não existe.");
-                return;
-            }
-            Objeto novo = new Objeto(
-                    0, titulo, descricao, marca,
-                    localizacao, categoria, tipoObjeto
-            );
-            novo.setUtilizador(this);
-            Transaction transaction = session.beginTransaction();
-            try {
-                session.persist(novo);
-                transaction.commit();
-                System.out.println("Objeto registado com ID " + novo.getId());
-            } catch (Exception e) {
-                if (transaction.isActive()) {
-                    transaction.rollback();
-                }
-                System.out.println("Erro ao registar objeto: " + e.getMessage());
-            }
+            // Guardar o objeto
+            session.persist(novo);
+            transaction.commit();
+            System.out.println("Objeto registado com ID " + novo.getId());
         } catch (Exception e) {
-            System.out.println("Erro ao aceder à base de dados: " + e.getMessage());
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            System.out.println("Erro ao registar objeto: " + e.getMessage());
         }
+    } catch (Exception e) {
+        System.out.println(
+                "Erro ao aceder à base de dados: " + e.getMessage());
     }
+}
 
     public void editarObjeto() {
         Objeto o = escolherObjeto();
