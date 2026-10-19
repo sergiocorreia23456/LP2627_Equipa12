@@ -26,6 +26,51 @@ public class Utilizador {
         return tipo;
     }
     
+    public static void criarConta() {
+        System.out.print("Nome: ");
+        String nome = Main.sc.nextLine();
+        System.out.print("Email: ");
+        String email = Main.sc.nextLine();
+        System.out.print("Password: ");
+        String password = Main.sc.nextLine();
+        System.out.print("Contacto: ");
+        String contacto = Main.sc.nextLine();
+
+        for (Utilizador u : Main.utilizadores) {
+            if (u.email.equals(email)) {
+                System.out.println("Esse email já existe!");
+                return;
+            }
+        }
+
+        Utilizador novo = new Utilizador(Main.proximoIdUtilizador, nome, email,
+                password, contacto, TipoUtilizador.UTILIZADOR);
+        Main.proximoIdUtilizador++;
+        Main.utilizadores.add(novo);
+        System.out.println("Conta criada com sucesso!");
+    }
+
+    public static void iniciarSessao() {
+        System.out.print("Email: ");
+        String email = Main.sc.nextLine();
+        System.out.print("Password: ");
+        String password = Main.sc.nextLine();
+
+        for (Utilizador u : Main.utilizadores) {
+            if (u.email.equals(email) && u.password.equals(password)) {
+                Main.sessaoAtual = u;
+                System.out.println("Bem-vindo, " + u.nome + "!");
+                return;
+            }
+        }
+        System.out.println("Email ou password errados.");
+    }
+
+    public void terminarSessao() {
+        Main.sessaoAtual = null;
+        System.out.println("Sessão terminada.");
+    }
+    
     public void editarPerfil() {
             System.out.print("Novo nome [" + nome + "]: ");
             String texto = Main.sc.nextLine();
