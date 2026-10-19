@@ -216,7 +216,7 @@ public class Utilizador {
         String localizacao = Main.sc.nextLine();
 
         System.out.println("Categorias:");
-        for (Categoria c : Main.categorias) {
+        for (Categoria c : Tabelas.obterCategorias()) {
             System.out.println(c.getId() + " - " + c.getNome());
         }
 

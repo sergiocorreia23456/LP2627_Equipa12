@@ -3,6 +3,7 @@ package pt.ipp.upt;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import org.hibernate.Session;
 
 public class Main {
 
@@ -11,18 +12,14 @@ public class Main {
     // Mantidas para compatibilidade com outras classes
     static ArrayList<Utilizador> utilizadores = new ArrayList<>();
     static ArrayList<Objeto> objetos = new ArrayList<>();
-    static ArrayList<Categoria> categorias = new ArrayList<>();
-
-    static Utilizador sessaoAtual = null;
-
+    static Utilizador sessaoAtual = null; // quem tem a sessão iniciada
     static int proximoIdUtilizador = 2;
     static int proximoIdObjeto = 1;
     static int proximoIdMarca = 1;
 
     public static void main(String[] args) {
-
-        criarAdministradorInicial();
-
+        //Administrador
+        utilizadores.add(new Administrador(1, "Admin UPT", "admin@upt.pt", "123", "999888777"));
         System.out.println("╔════════════════════════════════════╗");
         System.out.println("║    OBJETOS ACHADOS E PERDIDOS      ║");
         System.out.println("╚════════════════════════════════════╝");
@@ -94,7 +91,9 @@ public class Main {
     }
 
     public static Categoria procurarCategoria(int id) {
-        return Tabelas.procurarCategoriaPorId(id);
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(Categoria.class, id);
+        }
     }
 
     public static void titulo(String texto) {
@@ -112,16 +111,16 @@ public class Main {
 
         System.out.print("Opção: ");
         int opcao = lerInt();
-
-        switch (opcao) {
-            case 1 -> Utilizador.criarConta();
-            case 2 -> Utilizador.iniciarSessao();
-            case 0 -> {
-                System.out.println("Até à próxima!");
-                Tabelas.fechar();
-                System.exit(0);
-            }
-            default -> System.out.println("Opção inválida.");
+        if (opcao == 1) {
+            Utilizador.criarConta();
+        } else if (opcao == 2) {
+            Utilizador.iniciarSessao();
+        } else if (opcao == 0) {
+            System.out.println("Até à próxima!");
+            HibernateUtil.shutdown();
+            System.exit(0);
+        } else {
+            System.out.println("Opção inválida.");
         }
     }
 

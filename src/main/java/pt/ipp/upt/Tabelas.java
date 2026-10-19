@@ -8,120 +8,43 @@ import java.util.function.Function;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 
 public class Tabelas {
 
-	private static final SessionFactory factory = new Configuration()
-	        .configure("hibernate.cfg.xml")
-	        .addAnnotatedClass(Objeto.class)
-	        .buildSessionFactory();
-    // ========== MÉTODOS AUXILIARES ==========
-
-    // Executa operações que alteram a base de dados
-    private static boolean executar(Consumer<Session> operacao) {
-        Transaction tx = null;
-
-        try (Session s = factory.openSession()) {
-            tx = s.beginTransaction();
-            operacao.accept(s);
-            tx.commit();
-            return true;
-        } catch (Exception e) {
-            if (tx != null && tx.isActive()) tx.rollback();
-            System.out.println("Erro na base de dados: " + e.getMessage());
-            return false;
-        }
-    }
-
-    // Executa consultas à base de dados
-    private static <T> T consultar(Function<Session, T> consulta) {
-        try (Session s = factory.openSession()) {
-            return consulta.apply(s);
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                    "Erro na consulta: " + e.getMessage(), e);
-        }
-    }
-
-    // Lê um texto obrigatório
-    private static String lerNome(String mensagem) {
-        System.out.print(mensagem);
-        String nome = Main.sc.nextLine().trim();
-
-        if (nome.isEmpty())
-            System.out.println("O campo não pode estar vazio.");
-
-        return nome;
-    }
-
-    // Lista os registos de uma entidade
-    private static <T> List<T> listar(Class<T> classe) {
-        return consultar(s -> s.createQuery(
-                "from " + classe.getSimpleName(), classe
-        ).getResultList());
-    }
-
-    // Procura um registo por ID
-    private static <T> T procurar(Class<T> classe, int id) {
-        return consultar(s -> s.get(classe, id));
-    }
-
-    // Guarda um registo
-    private static <T> boolean guardar(T entidade) {
-        return executar(s -> s.persist(entidade));
-    }
-
-    // Elimina um registo
-    private static <T> boolean eliminar(Class<T> classe, int id) {
-        return executar(s -> {
-            T entidade = s.get(classe, id);
-
-            if (entidade == null)
-                throw new IllegalArgumentException("ID não existe.");
-
-            s.remove(entidade);
-        });
-    }
-
-    // ========== MENU ==========
-
+	private static final SessionFactory sessionFactory =
+	        HibernateUtil.getSessionFactory();
     public static void menu() {
-        while (true) {
-            System.out.println("\n=== Gerir Tabelas ===");
-            System.out.println("1 - Marcas");
-            System.out.println("2 - Categorias");
-            System.out.println("3 - Subcategorias");
-            System.out.println("4 - Utilizadores");
-            System.out.println("0 - Voltar");
-            System.out.print("Opção: ");
-
-            int tabela = Main.lerInt();
-            if (tabela == 0) return;
-
-            if (tabela < 1 || tabela > 4) {
-                System.out.println("Opção inválida.");
-                continue;
-            }
-
-            System.out.println("\n1 - Criar");
-            System.out.println("2 - Consultar");
-            System.out.println("3 - Editar");
-            System.out.println("4 - Eliminar");
-            System.out.println("0 - Voltar");
-            System.out.print("Opção: ");
-
-            int op = Main.lerInt();
-            if (op == 0) continue;
-
-            switch (tabela) {
-                case 1:
-                    switch (op) {
-                        case 1 -> criarMarca();
-                        case 2 -> readMarcas();
-                        case 3 -> editarMarca();
-                        case 4 -> eliminarMarca();
-                        default -> System.out.println("Opção inválida.");
+            while (true) {
+                System.out.println();
+                System.out.println("=== Gerir Tabelas ===");
+                System.out.println("1 - Marcas");
+                System.out.println("2 - Categorias");
+                System.out.println("3 - Subcategorias");
+                System.out.println("0 - Voltar");
+                System.out.print("Opção: ");
+                int tabela = Main.lerInt();
+                if (tabela == 0) {
+                    return;
+                }
+                if (tabela < 1 || tabela > 3) {
+                    System.out.println("Opção inválida.");
+                    continue;
+                }
+                System.out.println("1 - Criar");
+                System.out.println("2 - Consultar");
+                System.out.println("3 - Editar");
+                System.out.println("4 - Eliminar");
+                System.out.print("Opção: ");
+                int operacao = Main.lerInt();
+                if (tabela == 1) {
+                    if (operacao == 1) {
+                        criarMarca();
+                    } else if (operacao == 2) {
+                        readMarcas();
+                    } else if (operacao == 3) {
+                        editarMarca();
+                    } else if (operacao == 4) {
+                        eliminarMarca();
                     }
                     break;
 
@@ -155,7 +78,6 @@ public class Tabelas {
                     }
                     break;
             }
-        }
     }
 
     // ========== MARCAS ==========
@@ -208,8 +130,16 @@ public class Tabelas {
             System.out.println("Marca eliminada!");
     }
 
-    // ========== CATEGORIAS ==========
-
+    // ================= CATEGORIAS =================
+    public static ArrayList<Categoria> obterCategorias() {
+        try (Session session = sessionFactory.openSession()) {
+            return new ArrayList<>(
+                session.createQuery("from Categoria", Categoria.class)
+                       .getResultList()
+            );
+        }
+    }
+    
     public static void criarCategoria() {
         String nome = lerNome("Nome da categoria: ");
         if (nome.isEmpty()) return;
