@@ -1,7 +1,6 @@
 package pt.ipp.upt;
 
-import java.util.List;
-
+import java.util.ArrayList;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -99,9 +98,9 @@ public class Tabelas {
     public static void readMarcas() {
         System.out.println("--- Marcas ---");
         try (Session session = sessionFactory.openSession()) {
-            List<Marca> marcas = session
+            ArrayList<Marca> marcas = new ArrayList<>(session
                     .createQuery("from Marca", Marca.class)
-                    .getResultList();
+                    .getResultList());
             for (Marca m : marcas) {
                 System.out.println(m.getId() + " - " + m.getNome());
             }
@@ -181,9 +180,9 @@ public class Tabelas {
     public static void readCategorias() {
         System.out.println("--- Categorias ---");
         try (Session session = sessionFactory.openSession()) {
-            List<Categoria> categorias = session
-                    .createQuery("from Categoria", Categoria.class)
-                    .getResultList();
+        	ArrayList<Categoria> categorias = new ArrayList<>(session
+        	        .createQuery("from Categoria", Categoria.class)
+        	        .getResultList());
             for (Categoria c : categorias) {
                 System.out.println(c.getId() + " - " + c.getNome());
             }
@@ -280,10 +279,10 @@ public class Tabelas {
     public static void readSubCategorias() {
         System.out.println("--- Subcategorias ---");
         try (Session session = sessionFactory.openSession()) {
-            List<SubCategoria> subcategorias = session
-                    .createQuery("select s from SubCategoria s join s.categoria c "
-                            + "order by c.nome, s.nome", SubCategoria.class)
-                    .getResultList();
+        	ArrayList<SubCategoria> subcategorias = new ArrayList<>(session
+        	        .createQuery("select s from SubCategoria s join s.categoria c "
+        	                + "order by c.nome, s.nome", SubCategoria.class)
+        	        .getResultList());
             for (SubCategoria s : subcategorias) {
                 System.out.println(s.getId() + " - " + s.getCategoria().getNome()
                         + " > " + s.getNome());
