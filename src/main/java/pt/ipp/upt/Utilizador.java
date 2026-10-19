@@ -35,16 +35,13 @@ public class Utilizador {
         String password = Main.sc.nextLine();
         System.out.print("Contacto: ");
         String contacto = Main.sc.nextLine();
-
         for (Utilizador u : Main.utilizadores) {
             if (u.email.equals(email)) {
                 System.out.println("Esse email já existe!");
                 return;
             }
         }
-
-        Utilizador novo = new Utilizador(Main.proximoIdUtilizador, nome, email,
-                password, contacto, TipoUtilizador.UTILIZADOR);
+        Utilizador novo = new Utilizador(Main.proximoIdUtilizador, nome, email,password, contacto, TipoUtilizador.UTILIZADOR);
         Main.proximoIdUtilizador++;
         Main.utilizadores.add(novo);
         System.out.println("Conta criada com sucesso!");
@@ -55,7 +52,6 @@ public class Utilizador {
         String email = Main.sc.nextLine();
         System.out.print("Password: ");
         String password = Main.sc.nextLine();
-
         for (Utilizador u : Main.utilizadores) {
             if (u.email.equals(email) && u.password.equals(password)) {
                 Main.sessaoAtual = u;
@@ -63,7 +59,7 @@ public class Utilizador {
                 return;
             }
         }
-        System.out.println("Email ou password errados.");
+        System.out.println("Email ou password errados!");
     }
 
     public void terminarSessao() {
