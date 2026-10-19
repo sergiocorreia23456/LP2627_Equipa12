@@ -1,20 +1,34 @@
 package pt.ipp.upt;
-import java.util.ArrayList;
 import java.util.Scanner;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class Main {  // static pois o atributo pertence à classe, e não a cada objeto criado a partir dela.
-    static Scanner sc = new Scanner(System.in);
-    static ArrayList<Utilizador> utilizadores = new ArrayList<>();
-    static ArrayList<Objeto> objetos = new ArrayList<>();
-    static Utilizador sessaoAtual = null; // quem tem a sessão iniciada
-    static int proximoIdUtilizador = 2;
-    static int proximoIdObjeto = 1;
-    static int proximoIdMarca = 1;
-
-    public static void main(String[] args) {
+	static Scanner sc = new Scanner(System.in);
+	static Utilizador sessaoAtual = null;
+    
+	public static void main(String[] args) {
         //Administrador
-        utilizadores.add(new Administrador(1, "Admin UPT", "admin@upt.pt", "123", "999888777"));
+    	try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+    	    Utilizador admin = session.createQuery(
+    	        "FROM Utilizador WHERE email = :email", Utilizador.class)
+    	        .setParameter("email", "admin@upt.pt")
+    	        .uniqueResult();
+    	    if (admin == null) {
+    	        Transaction transaction = session.beginTransaction();
+    	        try {
+    	            Administrador novoAdmin = new Administrador(
+    	                0, "Admin UPT", "admin@upt.pt", "123", "999888777"
+    	            );
+    	            session.persist(novoAdmin);
+    	            transaction.commit();
+    	            System.out.println("Administrador criado com sucesso!");
+    	        } catch (Exception e) {
+    	            transaction.rollback();
+    	            System.out.println("Erro ao criar administrador: " + e.getMessage());
+    	        }
+    	    }
+    	}
         System.out.println("╔════════════════════════════════════╗");
         System.out.println("║    OBJETOS ACHADOS E PERDIDOS      ║");
         System.out.println("╚════════════════════════════════════╝");
