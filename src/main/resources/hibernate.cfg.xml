@@ -21,6 +21,9 @@
         <mapping class="pt.ipp.upt.Marca"/>
         <mapping class="pt.ipp.upt.Categoria"/>
         <mapping class="pt.ipp.upt.SubCategoria"/>
+        <mapping class="pt.ipp.upt.Utilizador"/>
+		<mapping class="pt.ipp.upt.Administrador"/>
+		<mapping class="pt.ipp.upt.Objeto"/>
 
     </session-factory>
 </hibernate-configuration>

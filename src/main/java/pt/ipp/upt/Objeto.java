@@ -1,16 +1,54 @@
 package pt.ipp.upt;
 import java.time.LocalDate;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Column;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
+@Entity
+@Table(name = "Objeto")
 public class Objeto {
-    private int id;
-    private String titulo;
-    private String descricao;
-    private Marca marca;
-    private String localizacao;
-    private LocalDate dataRegisto;
-    private Categoria categoria;
-    private boolean estado; // true = ativo, false = resolvido
-    private TipoObjeto tipo;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+
+	@Column(nullable = false)
+	private String titulo;
+
+	@Column(length = 1000)
+	private String descricao;
+
+	@ManyToOne
+	@JoinColumn(name = "marca_id")
+	private Marca marca;
+
+	private String localizacao;
+
+	private LocalDate dataRegisto;
+
+	@ManyToOne
+	@JoinColumn(name = "categoria_id")
+	private Categoria categoria;
+
+	private boolean estado;
+
+	@Enumerated(EnumType.STRING)
+	private TipoObjeto tipo;
+
+	@ManyToOne
+	@JoinColumn(name = "utilizador_id")
+	private Utilizador utilizador;
+	
+	protected Objeto() {
+	}
 
     public Objeto(int id, String titulo, String descricao, Marca marca,
                   String localizacao, Categoria categoria, TipoObjeto tipo) {
@@ -41,38 +79,69 @@ public class Objeto {
         return categoria;
     }
     
+    public void setUtilizador(Utilizador utilizador) {
+        this.utilizador = utilizador;
+    }
+    
     public void editar() {
-            System.out.print("Novo título [" + titulo + "]: ");
-            String texto = Main.sc.nextLine();
-            if (!texto.equals("")) {
-                titulo = texto;
+        System.out.print("Novo título [" + titulo + "]: ");
+        String novoTitulo = Main.sc.nextLine();
+        System.out.print("Nova descrição [" + descricao + "]: ");
+        String novaDescricao = Main.sc.nextLine();
+        System.out.print("Nova localização [" + localizacao + "]: ");
+        String novaLocalizacao = Main.sc.nextLine();
+        System.out.print("Já foi resolvido? (sim/não): ");
+        String resposta = Main.sc.nextLine();
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            Objeto objetoBD = session.get(Objeto.class, this.id);
+            if (objetoBD == null) {
+                System.out.println("Objeto não existe.");
+                transaction.rollback();
+                return;
             }
-            System.out.print("Nova descrição [" + descricao + "]: ");
-            texto = Main.sc.nextLine();
-            if (!texto.equals("")) {
-                descricao = texto;
+            if (!novoTitulo.isEmpty()) {
+                objetoBD.titulo = novoTitulo;
             }
-            System.out.print("Nova marca [" + marca.getNome() + "]: ");
-            texto = Main.sc.nextLine();
-            if (!texto.equals("")) {
-                marca = new Marca(Main.proximoIdMarca, texto);
-                Main.proximoIdMarca++;
+            if (!novaDescricao.isEmpty()) {
+                objetoBD.descricao = novaDescricao;
             }
-            System.out.print("Nova localização [" + localizacao + "]: ");
-            texto = Main.sc.nextLine();
-            if (!texto.equals("")) {
-                localizacao = texto;
+            if (!novaLocalizacao.isEmpty()) {
+                objetoBD.localizacao = novaLocalizacao;
             }
-            System.out.print("Já foi resolvido? (sim/não): ");
-            texto = Main.sc.nextLine();
-            if (texto.equals("sim")) {
-                estado = false;
+            if (resposta.equalsIgnoreCase("sim")) {
+                objetoBD.estado = false;
             }
-            System.out.println("Objeto atualizado!");
+            transaction.commit();
+            System.out.println("Objeto atualizado com sucesso!");
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            System.out.println("Erro ao atualizar objeto: " + e.getMessage());
         }
+    }
     
     public static void eliminar(Objeto o) {
-        Main.objetos.remove(o);
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            Objeto objetoBD = session.get(Objeto.class, o.getId());
+            if (objetoBD == null) {
+                System.out.println("Objeto não existe.");
+                transaction.rollback();
+                return;
+            }
+            session.remove(objetoBD);
+            transaction.commit();
+            System.out.println("Objeto eliminado da base de dados!");
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            System.out.println("Erro ao eliminar objeto: " + e.getMessage());
+        }
     }
     
     public void consultarDetalhes() {
