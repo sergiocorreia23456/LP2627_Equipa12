@@ -12,10 +12,14 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import jakarta.persistence.DiscriminatorColumn;
+
 
 @Entity
 @Table(name = "Utilizador")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "DTYPE")
+
 public class Utilizador {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,45 +62,91 @@ public class Utilizador {
     public TipoUtilizador getTipo() {
         return tipo;
     }
-    
-    public static void criarConta() {
+
+public static void criarConta() {
+
+    // Validar nome
+    String nome;
+    do {
         System.out.print("Nome: ");
-        String nome = Main.sc.nextLine();
+        nome = Main.sc.nextLine().trim();
+
+        if (nome.isEmpty()) {
+            System.out.println("Erro: O nome não pode estar vazio!");
+        }
+    } while (nome.isEmpty());
+
+    // Validar email
+    String email;
+    do {
         System.out.print("Email: ");
-        String email = Main.sc.nextLine();
-        String password;
-        do {
-            System.out.print("Password: ");
-            password = Main.sc.nextLine();
-            if (password.isBlank()) {
-                System.out.println("Erro: A password não pode estar vazia!");
-            }
-        } while (password.isBlank());
-        System.out.print("Contacto: ");
-        String contacto = Main.sc.nextLine();
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Utilizador existente = session.createQuery(
-                "FROM Utilizador WHERE email = :email", Utilizador.class)
+        email = Main.sc.nextLine().trim();
+
+        if (!email.matches("^[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}$")) {
+            System.out.println("Erro: Introduza um email válido!");
+        }
+    } while (!email.matches("^[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}$"));
+
+    // Validar password
+    String password;
+    do {
+        System.out.print("Password: ");
+        password = Main.sc.nextLine();
+
+        if (password.isBlank()) {
+            System.out.println("Erro: A password não pode estar vazia!");
+        }
+    } while (password.isBlank());
+
+    // Validar contacto
+    String contacto;
+    do {
+        System.out.print("Contacto (9 dígitos): ");
+        contacto = Main.sc.nextLine().trim();
+
+        if (!contacto.matches("\\d{9}")) {
+            System.out.println("Erro: O contacto deve ter 9 dígitos!");
+        }
+    } while (!contacto.matches("\\d{9}"));
+
+    // Guardar utilizador no MySQL
+    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+
+        Utilizador existente = session.createQuery(
+                "FROM Utilizador WHERE email = :email",
+                Utilizador.class)
                 .setParameter("email", email)
                 .uniqueResult();
-            if (existente != null) {
-                System.out.println("Esse email já existe!");
-                return;
-            }
-            Utilizador novo = new Utilizador(
-                0, nome, email, password, contacto, TipoUtilizador.UTILIZADOR
-            );
-            Transaction transaction = session.beginTransaction();
-            try {
-                session.persist(novo);
-                transaction.commit();
-                System.out.println("Conta criada com sucesso!");
-            } catch (Exception e) {
-                transaction.rollback();
-                System.out.println("Erro ao criar conta: " + e.getMessage());
-            }
+
+        if (existente != null) {
+            System.out.println("Esse email já existe!");
+            return;
         }
+
+        Utilizador novo = new Utilizador(
+                0, nome, email, password, contacto,
+                TipoUtilizador.UTILIZADOR
+        );
+
+        Transaction transaction = session.beginTransaction();
+
+        try {
+            session.persist(novo);
+            transaction.commit();
+            System.out.println("Conta criada com sucesso!");
+
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            System.out.println("Erro ao criar conta: " + e.getMessage());
+        }
+
+    } catch (Exception e) {
+        System.out.println("Erro ao aceder à base de dados: " + e.getMessage());
     }
+}
+
 
     public static void iniciarSessao() {
         System.out.print("Email: ");
@@ -186,12 +236,25 @@ public class Utilizador {
     TipoObjeto tipoObjeto = (opcao == 1)
             ? TipoObjeto.ENCONTRADO
             : TipoObjeto.PERDIDO;
-    System.out.print("Título: ");
-    String titulo = Main.sc.nextLine();
-    System.out.print("Descrição: ");
-    String descricao = Main.sc.nextLine();
-    System.out.print("Localização: ");
-    String localizacao = Main.sc.nextLine();
+    String titulo, descricao, localizacao;
+
+    do {
+        System.out.print("Título: ");
+        titulo = Main.sc.nextLine().trim();
+        if (titulo.isBlank()) System.out.println("Título obrigatório!");
+    } while (titulo.isBlank());
+
+    do {
+        System.out.print("Descrição: ");
+        descricao = Main.sc.nextLine().trim();
+        if (descricao.isBlank()) System.out.println("Descrição obrigatória!");
+    } while (descricao.isBlank());
+
+    do {
+        System.out.print("Localização: ");
+        localizacao = Main.sc.nextLine().trim();
+        if (localizacao.isBlank()) System.out.println("Localização obrigatória!");
+    } while (localizacao.isBlank());
     // O utilizador introduz a marca
     String nomeMarca;
     do {
