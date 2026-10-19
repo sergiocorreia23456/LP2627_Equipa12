@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "https://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+
+        <!-- Ligação à base de dados -->
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/objetos_encontrados_perdidos</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">password</property>
+
+        <!-- O Hibernate cria/atualiza as tabelas -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <property name="hibernate.show_sql">true</property>
+
+        <!-- Classes mapeadas -->
+        <mapping class="pt.ipp.upt.Marca"/>
+        <mapping class="pt.ipp.upt.Categoria"/>
+        <mapping class="pt.ipp.upt.SubCategoria"/>
+
+    </session-factory>
+</hibernate-configuration>

@@ -2,7 +2,7 @@ package pt.ipp.upt;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Main {
+public class Main {  // static pois o atributo pertence à classe, e não a cada objeto criado a partir dela.
     static Scanner sc = new Scanner(System.in);
     static ArrayList<Utilizador> utilizadores = new ArrayList<>();
     static ArrayList<Objeto> objetos = new ArrayList<>();
