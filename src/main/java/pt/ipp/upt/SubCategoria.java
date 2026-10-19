@@ -1,19 +1,35 @@
 package pt.ipp.upt;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "Subcategoria")
 public class SubCategoria {
-    private int id;
-    private String nome;
-    private Categoria categoria; // a categoria principal a que pertence
 
-    public SubCategoria(int id, String nome, Categoria categoria) {
-        this.id = id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column(name = "nome", nullable = false, length = 50)
+    private String nome;
+
+    // Lado dono da relação: cria a coluna categoria_id
+    @ManyToOne
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
+
+    public SubCategoria() {
+    }
+
+    public SubCategoria(String nome) {
         this.nome = nome;
-        this.categoria = categoria;
     }
 
     public int getId() {
@@ -31,5 +47,8 @@ public class SubCategoria {
     public Categoria getCategoria() {
         return categoria;
     }
-    //teste
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
 }
