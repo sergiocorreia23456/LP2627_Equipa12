@@ -75,8 +75,26 @@ public class GereObjetos {
                 System.out.println("Categoria não existe.");
                 return;
             }
+            System.out.println("Subcategorias:");
+            for (SubCategoria s : session.createQuery(
+                    "FROM SubCategoria WHERE categoria.id = :id",
+                    SubCategoria.class)
+                    .setParameter("id", categoria.getId())
+                    .getResultList()) {
+                System.out.println(s.getId() + " - " + s.getNome());
+            }
+            System.out.print("ID da subcategoria: ");
+            int idSubcategoria = Main.lerInt();
+            SubCategoria subcategoria = session.get(
+                    SubCategoria.class, idSubcategoria);
+            if (subcategoria == null ||
+                    subcategoria.getCategoria().getId() != categoria.getId()) {
+                System.out.println("Subcategoria inválida.");
+                return;
+            }
             Objeto novo = new Objeto(0, titulo, descricao, marca,localizacao, categoria, tipoObjeto);
             novo.setUtilizador(utilizador);
+            novo.setSubcategoria(subcategoria);
             Transaction transaction = session.beginTransaction();
             try {
                 if (novaMarca) {

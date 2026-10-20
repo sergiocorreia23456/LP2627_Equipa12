@@ -35,6 +35,10 @@ public class Objeto {
 	@ManyToOne
 	@JoinColumn(name = "categoria_id")
 	private Categoria categoria;
+	
+	@ManyToOne
+	@JoinColumn(name = "subcategoria_id")
+	private SubCategoria subcategoria;
 
 	private boolean estado;
 
@@ -77,6 +81,18 @@ public class Objeto {
         return categoria;
     }
     
+    public SubCategoria getSubcategoria() {
+        return subcategoria;
+    }
+
+    public void setSubcategoria(SubCategoria subcategoria) {
+        this.subcategoria = subcategoria;
+    }
+    
+    public Utilizador getUtilizador() {
+        return utilizador;
+    }
+    
     public void setUtilizador(Utilizador utilizador) {
         this.utilizador = utilizador;
     }
@@ -105,6 +121,11 @@ public class Objeto {
         System.out.println("Descrição: " + descricao);
         System.out.println("Marca: " + marca.getNome());
         System.out.println("Categoria: " + categoria.getNome());
+        if (subcategoria != null) {
+            System.out.println("Subcategoria: " + subcategoria.getNome());
+        } else {
+            System.out.println("Subcategoria: Não definida");
+        }
         System.out.println("Localização: " + localizacao);
         System.out.println("Data: " + dataRegisto);
         if (estado) {
