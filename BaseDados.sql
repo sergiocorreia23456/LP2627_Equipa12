@@ -10,9 +10,6 @@
 -- Cria a base de dados apenas se ainda não existir.
 
 CREATE DATABASE IF NOT EXISTS objetos_encontrados_perdidos
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-
 
 -- 2. SELEÇÃO DA BASE DE DADOS
 -- Define a base de dados a utilizar.

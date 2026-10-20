@@ -54,6 +54,10 @@ import jakarta.persistence.OneToMany;
         this.contacto = contacto;
         this.tipo = tipo;
     }
+    
+    public int getId() {
+        return id;
+    }
     public String getNome() {
         return nome;
     }
