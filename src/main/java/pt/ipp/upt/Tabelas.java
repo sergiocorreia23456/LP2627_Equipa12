@@ -7,8 +7,7 @@ import org.hibernate.Transaction;
 
 public class Tabelas {
 
-	private static final SessionFactory sessionFactory =
-	        HibernateUtil.getSessionFactory();
+	private static final SessionFactory sessionFactory =HibernateUtil.getSessionFactory();
     public static void menu() {
             while (true) {
                 System.out.println();

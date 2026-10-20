@@ -17,9 +17,10 @@ public class Main {  // static pois o atributo pertence à classe, e não a cada
     	    if (admin == null) {
     	        Transaction transaction = session.beginTransaction();
     	        try {
-    	            Administrador novoAdmin = new Administrador(
-    	                0, "Admin UPT", "admin@upt.pt", "123", "999888777"
-    	            );
+    	        	Utilizador novoAdmin = new Utilizador(
+    	        		    0, "Administrador da UPT", "admin@upt.pt", "123",
+    	        		    "999888777", TipoUtilizador.ADMINISTRADOR
+    	        		);
     	            session.persist(novoAdmin);
     	            transaction.commit();
     	            System.out.println("Administrador criado com sucesso!");
@@ -119,8 +120,7 @@ public class Main {  // static pois o atributo pertence à classe, e não a cada
     }
 
     public static void menuAdministrador() {
-        Administrador admin = (Administrador) sessaoAtual;
-        titulo("Administrador: " + admin.getNome());
+    	titulo("Administrador: " + sessaoAtual.getNome());
         System.out.println("  1 - Ver todos os objetos");
         System.out.println("  2 - Ver estatísticas");
         System.out.println("  3 - Eliminar anúncio");
