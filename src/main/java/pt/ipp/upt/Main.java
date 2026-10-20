@@ -73,9 +73,9 @@ public class Main {  // static pois o atributo pertence à classe, e não a cada
         System.out.print("Opção: ");
         int opcao = lerInt();
         if (opcao == 1) {
-            Utilizador.criarConta();
+            GereUtilizadores.criarConta();
         } else if (opcao == 2) {
-            Utilizador.iniciarSessao();
+            GereUtilizadores.iniciarSessao();
         } else if (opcao == 0) {
             System.out.println("Até à próxima!");
             HibernateUtil.shutdown();
@@ -98,21 +98,21 @@ public class Main {  // static pois o atributo pertence à classe, e não a cada
         System.out.print("Opção: ");
         int opcao = lerInt();
         if (opcao == 1) {
-            sessaoAtual.registarObjeto();
+        	GereObjetos.registarObjeto(sessaoAtual);
         } else if (opcao == 2) {
-            sessaoAtual.editarObjeto();
+        	GereObjetos.editarObjeto(sessaoAtual);
         } else if (opcao == 3) {
-            sessaoAtual.eliminarObjeto();
+            GereObjetos.eliminarObjeto(sessaoAtual);
         } else if (opcao == 4) {
-            sessaoAtual.pesquisarObjeto();
+        	GereObjetos.pesquisarObjeto();
         } else if (opcao == 5) {
-            sessaoAtual.consultarObjetosEncontrados();
+        	GereObjetos.consultarObjetosEncontrados();
         } else if (opcao == 6) {
-            sessaoAtual.visualizarAnuncios();
+        	GereObjetos.visualizarAnuncios();
         } else if (opcao == 7) {
-            sessaoAtual.editarPerfil();
+        	GereUtilizadores.editarPerfil(sessaoAtual);
         } else if (opcao == 0) {
-            sessaoAtual.terminarSessao();
+        	GereUtilizadores.terminarSessao();
         } else {
             System.out.println("Opção inválida.");
         }
@@ -129,15 +129,15 @@ public class Main {  // static pois o atributo pertence à classe, e não a cada
         System.out.print("Opção: ");
         int opcao = lerInt();
         if (opcao == 1) {
-            admin.visualizarObjeto();
+        	GereObjetos.visualizarObjeto();
         } else if (opcao == 2) {
-            admin.consultarEstatisticas();
+        	GereObjetos.consultarEstatisticas(sessaoAtual);
         } else if (opcao == 3) {
-            admin.eliminarAnuncio();
+        	GereObjetos.eliminarAnuncio();
         } else if (opcao == 4) {
             Tabelas.menu();
         } else if (opcao == 0) {
-            admin.terminarSessao();
+        	GereUtilizadores.terminarSessao();
         } else {
             System.out.println("Opção inválida.");
         }

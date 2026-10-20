@@ -10,8 +10,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Column;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 @Entity
 @Table(name = "Objeto")
@@ -83,65 +81,20 @@ public class Objeto {
         this.utilizador = utilizador;
     }
     
-    public void editar() {
-        System.out.print("Novo título [" + titulo + "]: ");
-        String novoTitulo = Main.sc.nextLine();
-        System.out.print("Nova descrição [" + descricao + "]: ");
-        String novaDescricao = Main.sc.nextLine();
-        System.out.print("Nova localização [" + localizacao + "]: ");
-        String novaLocalizacao = Main.sc.nextLine();
-        System.out.print("Já foi resolvido? (sim/não): ");
-        String resposta = Main.sc.nextLine();
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            Objeto objetoBD = session.get(Objeto.class, this.id);
-            if (objetoBD == null) {
-                System.out.println("Objeto não existe.");
-                transaction.rollback();
-                return;
-            }
-            if (!novoTitulo.isEmpty()) {
-                objetoBD.titulo = novoTitulo;
-            }
-            if (!novaDescricao.isEmpty()) {
-                objetoBD.descricao = novaDescricao;
-            }
-            if (!novaLocalizacao.isEmpty()) {
-                objetoBD.localizacao = novaLocalizacao;
-            }
-            if (resposta.equalsIgnoreCase("sim")) {
-                objetoBD.estado = false;
-            }
-            transaction.commit();
-            System.out.println("Objeto atualizado com sucesso!");
-        } catch (Exception e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-            System.out.println("Erro ao atualizar objeto: " + e.getMessage());
-        }
+    public void setTitulo(String titulo) {
+    	this.titulo = titulo;
     }
-    
-    public static void eliminar(Objeto o) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            Objeto objetoBD = session.get(Objeto.class, o.getId());
-            if (objetoBD == null) {
-                System.out.println("Objeto não existe.");
-                transaction.rollback();
-                return;
-            }
-            session.remove(objetoBD);
-            transaction.commit();
-            System.out.println("Objeto eliminado da base de dados!");
-        } catch (Exception e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-            System.out.println("Erro ao eliminar objeto: " + e.getMessage());
-        }
+
+    public void setDescricao(String descricao) {
+    	this.descricao = descricao;
+    }
+
+    public void setLocalizacao(String localizacao) {
+    	this.localizacao = localizacao;
+    }
+
+    public void setEstado(boolean estado) {
+    	this.estado = estado;
     }
     
     public void consultarDetalhes() {
