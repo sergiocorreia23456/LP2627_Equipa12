@@ -14,13 +14,14 @@ public class GereUtilizadores {
 	        }
 	    } while (nome.isEmpty());
 	    String email;
-	    do {
+	    while (true) {
 	        System.out.print("Email: ");
 	        email = Main.sc.nextLine().trim();
-	        if (!email.matches("^[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}$")) {
-	            System.out.println("Erro: Introduza um email válido!");
+	        if (email.matches("^[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}$")) {
+	            break;
 	        }
-	    } while (!email.matches("^[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}$"));
+	        System.out.println("Erro: Introduza um email válido!");
+	    }
 	    String password;
 	    do {
 	        System.out.print("Password: ");

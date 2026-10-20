@@ -92,8 +92,7 @@ public class GereObjetos {
                 System.out.println("Erro ao registar objeto: " + e.getMessage());
             }
         } catch (Exception e) {
-            System.out.println(
-                    "Erro ao aceder à base de dados: " + e.getMessage());
+            System.out.println("Erro ao aceder à base de dados: " + e.getMessage());
         }
     }
 
@@ -180,8 +179,7 @@ public class GereObjetos {
                 o.consultarDetalhes();
             }
         } catch (Exception e) {
-            System.out.println(
-                    "Erro ao consultar anúncios: " + e.getMessage());
+            System.out.println("Erro ao consultar anúncios: " + e.getMessage());
         }
     }
 
@@ -218,7 +216,7 @@ public class GereObjetos {
         }
         return null;
     }
-
+    // administrador ver os objetos criados
     public static void visualizarObjeto() {
         System.out.println("--- Todos os objetos ---");
         try (Session session =

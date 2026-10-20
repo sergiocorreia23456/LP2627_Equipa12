@@ -7,14 +7,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
-import jakarta.persistence.DiscriminatorColumn;
+import java.util.ArrayList;
+import java.util.List;
+import jakarta.persistence.OneToMany;
 
 	@Entity
 	@Table(name = "Utilizador")
-	@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-	@DiscriminatorColumn(name = "DTYPE")
 
 	public class Utilizador {
 	@Id
@@ -36,6 +34,13 @@ import jakarta.persistence.DiscriminatorColumn;
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private TipoUtilizador tipo;
+	
+	@OneToMany(mappedBy = "utilizador")
+	private List<Objeto> objetos = new ArrayList<>();
+	
+	public List<Objeto> getObjetos() {
+	    return objetos;
+	}
 	
 	protected Utilizador() {
 	}
