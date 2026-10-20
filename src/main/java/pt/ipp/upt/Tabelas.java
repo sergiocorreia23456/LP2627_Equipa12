@@ -66,7 +66,6 @@ public class Tabelas {
             }
     }
     // ================= MARCAS =================
-
     public static void criarMarca() {
     String nome;
     do {
@@ -89,7 +88,6 @@ public class Tabelas {
             System.out.println("Essa marca já existe na base de dados!");
             return;
         }
-        // Criar uma nova marca
         transaction = session.beginTransaction();
         session.persist(new Marca(nome));
         transaction.commit();
@@ -115,7 +113,6 @@ public class Tabelas {
             System.out.println("Erro na base de dados: " + e.getMessage());
         }
     }
-
 
     public static void editarMarca() {
     readMarcas();

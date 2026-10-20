@@ -59,7 +59,7 @@ public class Main {  // static pois o atributo pertence à classe, e não a cada
         }
     }
 
-    // Título dos menus
+    // Título dos menus ( aspeto visual )
     public static void titulo(String texto) {
         System.out.println();
         System.out.println("── " + texto + " " + "─".repeat(Math.max(0, 34 - texto.length())));
