@@ -15,12 +15,12 @@ import org.hibernate.Transaction;
 import jakarta.persistence.DiscriminatorColumn;
 
 
-@Entity
-@Table(name = "Utilizador")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "DTYPE")
+	@Entity
+	@Table(name = "Utilizador")
+	@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+	@DiscriminatorColumn(name = "DTYPE")
 
-public class Utilizador {
+	public class Utilizador {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
@@ -63,90 +63,66 @@ public class Utilizador {
         return tipo;
     }
 
-public static void criarConta() {
-
-    // Validar nome
+    public static void criarConta() {
     String nome;
     do {
         System.out.print("Nome: ");
         nome = Main.sc.nextLine().trim();
-
         if (nome.isEmpty()) {
             System.out.println("Erro: O nome não pode estar vazio!");
         }
     } while (nome.isEmpty());
-
-    // Validar email
     String email;
     do {
         System.out.print("Email: ");
         email = Main.sc.nextLine().trim();
-
         if (!email.matches("^[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}$")) {
             System.out.println("Erro: Introduza um email válido!");
         }
     } while (!email.matches("^[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}$"));
-
-    // Validar password
     String password;
     do {
         System.out.print("Password: ");
         password = Main.sc.nextLine();
-
         if (password.isBlank()) {
             System.out.println("Erro: A password não pode estar vazia!");
         }
     } while (password.isBlank());
-
-    // Validar contacto
     String contacto;
     do {
         System.out.print("Contacto (9 dígitos): ");
         contacto = Main.sc.nextLine().trim();
-
         if (!contacto.matches("\\d{9}")) {
             System.out.println("Erro: O contacto deve ter 9 dígitos!");
         }
     } while (!contacto.matches("\\d{9}"));
-
     // Guardar utilizador no MySQL
     try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-
         Utilizador existente = session.createQuery(
                 "FROM Utilizador WHERE email = :email",
                 Utilizador.class)
                 .setParameter("email", email)
                 .uniqueResult();
-
         if (existente != null) {
             System.out.println("Esse email já existe!");
             return;
         }
-
-        Utilizador novo = new Utilizador(
-                0, nome, email, password, contacto,
-                TipoUtilizador.UTILIZADOR
-        );
-
+        Utilizador novo = new Utilizador(0, nome, email, password, contacto,TipoUtilizador.UTILIZADOR);
         Transaction transaction = session.beginTransaction();
-
         try {
             session.persist(novo);
             transaction.commit();
             System.out.println("Conta criada com sucesso!");
-
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
             System.out.println("Erro ao criar conta: " + e.getMessage());
         }
-
     } catch (Exception e) {
         System.out.println("Erro ao aceder à base de dados: " + e.getMessage());
     }
 }
-
 
     public static void iniciarSessao() {
         System.out.print("Email: ");
@@ -164,7 +140,6 @@ public static void criarConta() {
             } else {
                 System.out.println("Email ou password errados!");
             }
-
         } catch (Exception e) {
             System.out.println("Erro ao iniciar sessão: " + e.getMessage());
         }
@@ -225,7 +200,6 @@ public static void criarConta() {
         }
     }
 
-
     public void registarObjeto() {
     System.out.print("Tipo (1 = Encontrado, 2 = Perdido): ");
     int opcao = Main.lerInt();
@@ -233,29 +207,31 @@ public static void criarConta() {
         System.out.println("Tipo inválido.");
         return;
     }
-    TipoObjeto tipoObjeto = (opcao == 1)
-            ? TipoObjeto.ENCONTRADO
-            : TipoObjeto.PERDIDO;
+    TipoObjeto tipoObjeto;
+    if (opcao == 1) {
+        tipoObjeto = TipoObjeto.ENCONTRADO;
+    } else {
+        tipoObjeto = TipoObjeto.PERDIDO;
+    }
     String titulo, descricao, localizacao;
-
     do {
         System.out.print("Título: ");
         titulo = Main.sc.nextLine().trim();
-        if (titulo.isBlank()) System.out.println("Título obrigatório!");
+        if (titulo.isBlank()) 
+        	System.out.println("Título obrigatório!");
     } while (titulo.isBlank());
-
     do {
         System.out.print("Descrição: ");
         descricao = Main.sc.nextLine().trim();
-        if (descricao.isBlank()) System.out.println("Descrição obrigatória!");
+        if (descricao.isBlank()) 
+        	System.out.println("Descrição obrigatória!");
     } while (descricao.isBlank());
-
     do {
         System.out.print("Localização: ");
         localizacao = Main.sc.nextLine().trim();
-        if (localizacao.isBlank()) System.out.println("Localização obrigatória!");
+        if (localizacao.isBlank()) 
+        	System.out.println("Localização obrigatória!");
     } while (localizacao.isBlank());
-    // O utilizador introduz a marca
     String nomeMarca;
     do {
         System.out.print("Marca: ");
@@ -313,8 +289,7 @@ public static void criarConta() {
             System.out.println("Erro ao registar objeto: " + e.getMessage());
         }
     } catch (Exception e) {
-        System.out.println(
-                "Erro ao aceder à base de dados: " + e.getMessage());
+        System.out.println("Erro ao aceder à base de dados: " + e.getMessage());
     }
 }
 
@@ -376,10 +351,9 @@ public static void criarConta() {
     // o utilizador elimina o objeto
     public void eliminarObjeto() {
         Objeto o = escolherObjeto();
+
         if (o != null) {
             Objeto.eliminar(o);
-            objetos.remove(o);
-            System.out.println("Objeto eliminado!");
         }
     }
     // o admin remove o objeto se tiver informação incorreta

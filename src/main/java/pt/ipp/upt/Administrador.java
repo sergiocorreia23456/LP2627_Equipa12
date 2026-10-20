@@ -51,7 +51,7 @@ public class Administrador extends Utilizador {
         }
     }
 
-    public void consultarEstatisticas() {
+    public void consultarEstatisticas() {  //utilizamos Long porque a função COUNT() do Hibernate devolve esse tipo de dados
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Long totalUtilizadores = session.createQuery(
                 "SELECT COUNT(u) FROM Utilizador u", Long.class
