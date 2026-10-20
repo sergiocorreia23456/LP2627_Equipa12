@@ -30,6 +30,7 @@ public class Main {  // static pois o atributo pertence à classe, e não a cada
     	        }
     	    }
     	}
+    	ValoresIniciais.criarCategorias();
         System.out.println("╔════════════════════════════════════╗");
         System.out.println("║    OBJETOS ACHADOS E PERDIDOS      ║");
         System.out.println("╚════════════════════════════════════╝");
