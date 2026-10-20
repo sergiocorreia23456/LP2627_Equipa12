@@ -24,7 +24,6 @@ public class ValoresIniciais {
             transaction = session.beginTransaction();
 
             for (String[] grupo : dados) {
-
                 String nomeCategoria = grupo[0];
 
                 Categoria categoria = session.createQuery(
@@ -33,7 +32,6 @@ public class ValoresIniciais {
                     .setParameter("nome", nomeCategoria)
                     .setMaxResults(1)
                     .uniqueResult();
-
                 if (categoria == null) {
                     categoria = new Categoria(nomeCategoria);
                     session.persist(categoria);
@@ -42,7 +40,6 @@ public class ValoresIniciais {
                 for (int i = 1; i < grupo.length; i++) {
 
                     String nomeSubcategoria = grupo[i];
-
                     Long quantidade = session.createQuery(
                         "SELECT COUNT(s) FROM SubCategoria s " +
                         "WHERE s.nome = :nome " +
