@@ -92,9 +92,8 @@ public class GereObjetos {
                 System.out.println("Subcategoria inválida.");
                 return;
             }
-            Objeto novo = new Objeto(0, titulo, descricao, marca,localizacao, categoria, tipoObjeto);
+            Objeto novo = new Objeto(0, titulo, descricao, marca,localizacao, subcategoria, tipoObjeto);
             novo.setUtilizador(utilizador);
-            novo.setSubcategoria(subcategoria);
             Transaction transaction = session.beginTransaction();
             try {
                 if (novaMarca) {
@@ -120,12 +119,21 @@ public class GereObjetos {
             editar(o);
         }
     }
-    // o utilizador elimina o objeto
+    
     public static void eliminarObjeto(Utilizador utilizador) {
         Objeto o = escolherObjeto(utilizador);
-        if (o != null) {
-        	eliminar(o);
+        if (o == null) {
+            return;
         }
+        if (!o.isEstado()) {
+            System.out.println("Não podes eliminar um anúncio resolvido.");
+            return;
+        }
+        if (o.getTipo() != TipoObjeto.PERDIDO) {
+            System.out.println("Só podes eliminar anúncios de objetos perdidos.");
+            return;
+        }
+        eliminar(o);
     }
 
     public static void pesquisarObjeto() {
@@ -140,7 +148,7 @@ public class GereObjetos {
                     "LOWER(o.descricao) LIKE :palavra OR " +
                     "LOWER(o.localizacao) LIKE :palavra OR " +
                     "LOWER(o.marca.nome) LIKE :palavra OR " +
-                    "LOWER(o.categoria.nome) LIKE :palavra)",
+                    "LOWER(o.subcategoria.categoria.nome) LIKE :palavra)",
                     Objeto.class
                 )
                 .setParameter("palavra", "%" + palavra + "%")
@@ -260,10 +268,14 @@ public class GereObjetos {
         visualizarObjeto();
         System.out.print("ID do anúncio a eliminar: ");
         int id = Main.lerInt();
-        try (Session session =HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Objeto objeto = session.get(Objeto.class, id);
             if (objeto == null) {
                 System.out.println("Esse anúncio não existe.");
+                return;
+            }
+            if (!objeto.isEstado()) {
+                System.out.println("Não é possível eliminar um anúncio resolvido.");
                 return;
             }
             eliminar(objeto);
@@ -279,8 +291,6 @@ public class GereObjetos {
     String novaDescricao = Main.sc.nextLine();
     System.out.print("Nova localização (Enter para manter): ");
     String novaLocalizacao = Main.sc.nextLine();
-    System.out.print("Já foi resolvido? (sim/não): ");
-    String resposta = Main.sc.nextLine();
     Transaction transaction = null;
     try (Session session = HibernateUtil.getSessionFactory().openSession()) {
         transaction = session.beginTransaction();
@@ -299,9 +309,6 @@ public class GereObjetos {
         if (!novaLocalizacao.isEmpty()) {
             objetoBD.setLocalizacao(novaLocalizacao);
         }
-        if (resposta.equalsIgnoreCase("sim")) {
-            objetoBD.setEstado(false);
-        }
         transaction.commit();
         System.out.println("Objeto atualizado com sucesso!");
     } catch (Exception e) {
@@ -319,6 +326,11 @@ public class GereObjetos {
         Objeto objetoBD = session.get(Objeto.class, o.getId());
         if (objetoBD == null) {
             System.out.println("Objeto não existe.");
+            transaction.rollback();
+            return;
+        }
+        if (!objetoBD.isEstado()) {
+            System.out.println("Não é possível eliminar um anúncio resolvido.");
             transaction.rollback();
             return;
         }
@@ -366,6 +378,39 @@ public class GereObjetos {
             System.out.println("Resolvidos: " + resolvidos);
         } catch (Exception e) {
             System.out.println("Erro ao consultar estatísticas: " + e.getMessage());
+        }
+    }
+    
+    public static void resolverObjeto(Utilizador utilizador) {
+    	if (utilizador == null || utilizador.getTipo() != TipoUtilizador.ADMINISTRADOR) {
+ 	        System.out.println("Apenas administradores podem resolver anúncios.");
+    	    return;
+    	}
+        visualizarObjeto();
+        System.out.print("ID do anúncio a resolver: ");
+        int id = Main.lerInt();
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            Objeto objeto = session.get(Objeto.class, id);
+            if (objeto == null) {
+                System.out.println("Anúncio não encontrado.");
+                transaction.rollback();
+                return;
+            }
+            if (!objeto.isEstado()) {
+                System.out.println("Este anúncio já está resolvido.");
+                transaction.rollback();
+                return;
+            }
+            objeto.setEstado(false);
+            transaction.commit();
+            System.out.println("Anúncio resolvido!");
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            System.out.println("Erro ao resolver anúncio: " + e.getMessage());
         }
     }
 }

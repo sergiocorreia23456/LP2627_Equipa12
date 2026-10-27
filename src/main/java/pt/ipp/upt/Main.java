@@ -125,7 +125,8 @@ public class Main {  // static pois o atributo pertence à classe, e não a cada
         System.out.println("  1 - Ver todos os objetos");
         System.out.println("  2 - Ver estatísticas");
         System.out.println("  3 - Eliminar anúncio");
-        System.out.println("  4 - Gerir tabelas (marcas, categorias, subcategorias)");
+        System.out.println("  4 - Marcar anúncio como resolvido");
+        System.out.println("  5 - Gerir tabelas (marcas, categorias, subcategorias)");
         System.out.println("  0 - Terminar sessão");
         System.out.print("Opção: ");
         int opcao = lerInt();
@@ -136,6 +137,8 @@ public class Main {  // static pois o atributo pertence à classe, e não a cada
         } else if (opcao == 3) {
         	GereObjetos.eliminarAnuncio();
         } else if (opcao == 4) {
+        	GereObjetos.resolverObjeto(sessaoAtual);
+        } else if (opcao == 5) {
             Tabelas.menu();
         } else if (opcao == 0) {
         	GereUtilizadores.terminarSessao();

@@ -31,10 +31,6 @@ public class Objeto {
 	private String localizacao;
 
 	private LocalDate dataRegisto;
-
-	@ManyToOne
-	@JoinColumn(name = "categoria_id")
-	private Categoria categoria;
 	
 	@ManyToOne
 	@JoinColumn(name = "subcategoria_id")
@@ -53,13 +49,13 @@ public class Objeto {
 	}
 
     public Objeto(int id, String titulo, String descricao, Marca marca,
-                  String localizacao, Categoria categoria, TipoObjeto tipo) {
+                  String localizacao, SubCategoria subcategoria, TipoObjeto tipo) {
         this.id = id;
         this.titulo = titulo;
         this.descricao = descricao;
         this.marca = marca;
         this.localizacao = localizacao;
-        this.categoria = categoria;
+        this.subcategoria = subcategoria;
         this.tipo = tipo;
         this.dataRegisto = LocalDate.now();
         this.estado = true;
@@ -78,7 +74,10 @@ public class Objeto {
         return tipo;
     }
     public Categoria getCategoria() {
-        return categoria;
+        if (subcategoria == null) {
+            return null;
+        }
+        return subcategoria.getCategoria();
     }
     
     public SubCategoria getSubcategoria() {
@@ -120,7 +119,11 @@ public class Objeto {
         System.out.println("Título: " + titulo);
         System.out.println("Descrição: " + descricao);
         System.out.println("Marca: " + marca.getNome());
-        System.out.println("Categoria: " + categoria.getNome());
+        if (getCategoria() != null) {
+            System.out.println("Categoria: " + getCategoria().getNome());
+        } else {
+            System.out.println("Categoria: Não definida");
+        }
         if (subcategoria != null) {
             System.out.println("Subcategoria: " + subcategoria.getNome());
         } else {
@@ -138,6 +141,7 @@ public class Objeto {
     // Usado na pesquisa: junta todo o texto do objeto numa só String
     public String getTextoParaPesquisa() {
         return titulo + " " + descricao + " " + marca.getNome() + " "
-                + localizacao + " " + categoria.getNome();
+                + localizacao + " "
+                + (getCategoria() != null ? getCategoria().getNome() : "");
     }
 }
